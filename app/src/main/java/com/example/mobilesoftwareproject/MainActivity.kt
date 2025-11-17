@@ -162,47 +162,46 @@ fun QuizNavHost() {
                 },
                 //결과화면 -> 메인화면
                 onGoHome = {
-                    navController.popBackStack( // 뒤로가긴하는데,
-                        route = Screen.Category.route, // 루트를 카테고리 화면으로 지정
-                        inclusive = false // 카테고리만 남기고 그 위 화면들은 제거 ( 퀴즈화면같은것들 )
+                    navController.popBackStack( //뒤로가긴하는데,
+                        route = Screen.Category.route, //루트를 카테고리 화면으로 지정
+                        inclusive = false //카테고리만 남기고 그 위 화면들은 제거 ( 퀴즈화면같은것들 )
                     )
                 },
-                //결과화면 -> 랭킹화면
+                //결과화면 -> 랭킹화면 / 이름 넘겨줘야함
                 onSaveRanking = { name ->
-                    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) //날짜를 저장하기위한 상수 지정
                         .format(Date())
                     val item = Ranking(
                         name = name,
                         score = score,
                         total = total,
                         categoryId = categoryId,
-                        date = currentDate      // 날짜 추가
+                        date = currentDate      //날짜 추가
                     )
+                    //랭킹에 위의 정보들 저장
                     RankingStore.addRanking(context, item)
-                    WrongAnswerStore.setUserNameForAll(name) // 오답에도 닉네임 채워주기
+                    //이름 가져온김에 오답노트 정보에도 이름 추가
+                    WrongAnswerStore.setUserNameForAll(name) //오답에도 닉네임 채워주기
                 }
             )
         }
 
-        // ───────── 퀴즈 화면 ─────────
+        //퀴즈 화면
         composable(
             route = Screen.Quiz.route,   // "quiz/{categoryId}"
             arguments = listOf(
                 navArgument("categoryId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-
-            // 실제 전달된 categoryId 값을 꺼냄
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
-
-            // 선택한 카테고리에 해당하는 문제 리스트를 QuizData에서 가져오기
+            //카테고리ID에 알맞는 퀴즈들을 호출
             val questionsForCategory = QuizData.getQuestions(categoryId)
-
-            // QuizScreen 호출하면서 문제 리스트 전달
+            //QuizScreen 호출
             QuizScreen(
                 question = questionsForCategory,
-                categoryId = categoryId, // 🔧 오답 저장 시 카테고리 사용하려고 추가했을 거라 유지
-                onQuizFinished = { score, total -> // 퀴즈가 끝났을 때 실행
+                categoryId = categoryId,
+                //퀴즈화면 -> 결과화면 // 점수와 총개수 넘겨줘야함
+                onQuizFinished = { score, total ->
                     navController.navigate(
                         Screen.Result.createRoute(categoryId, score, total)
                     )

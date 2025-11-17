@@ -25,14 +25,14 @@ import androidx.compose.ui.unit.dp
 import com.example.mobilesoftwareproject.model.Ranking
 
 @Composable
-fun RankingScreen( // 랭킹 화면
+fun RankingScreen( //랭킹 화면
     ranking:List<Ranking>,
-    onBack: () -> Unit // 뒤로가기 버튼을 눌렀을 때 실행되는 콜백 함수
+    onBack: () -> Unit //뒤로가기 버튼을 눌렀을 때 실행되는 콜백 함수
 ){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), // Edge와의 간격을 생성
+            .padding(16.dp), //Edge와의 간격을 생성
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
@@ -56,7 +56,8 @@ fun RankingScreen( // 랭킹 화면
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ){
-                itemsIndexed(ranking){ // 리스트의 내용을 순회하기 위함( 여러 인덱스 가능 )
+                //Lazy컴포저블 내부에서 리스트의 항목을 화면에 표시하기위해 반복적으로 UI항목 생성 ( ranking을 순회 )
+                itemsIndexed(ranking){ //리스트의 내용을 순회하기 위함( 여러 인덱스 가능 )
                     index,item ->
                     RankingRow(
                         rank = index +1,

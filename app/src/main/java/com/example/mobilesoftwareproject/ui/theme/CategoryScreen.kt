@@ -31,37 +31,41 @@ import kotlinx.coroutines.selects.select
 
 //카테고리 선택 화면 - 메인 화면
 @Composable
-fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Unit = {},onShowWrongNote: (String) -> Unit = {}) // 나중에 퀴즈 시작할 때 쓸 콜백
+fun CategoryScreen(onStartQuiz:(String)->Unit = {}, // 퀴즈 시작 버튼이 눌렸을 때 신호 전달
+                   onShowRanking: (String)-> Unit = {}, // 랭킹 버튼이 눌렸을 때 신호 전달
+                   onShowWrongNote: (String) -> Unit = {}) // 오답노트 버튼이 눌렸을 때 신호 전달
 {
     var selectedCategoryId by remember { mutableStateOf<String?>(null) }
-    //페이지 넘어갔을 때, 선택한 카테고리를 기억하기 위함
+    //사용자가 어떤 카테고리를 눌렀는지 기억하기 위함
+    //Compose가 값을 기억하고, 값이 바뀌면 화면을 다시 그려줌
+    //처음엔 아무것도 선택되지않은 상태라 null해야함
     Column(
         modifier = Modifier
-            .fillMaxSize() // 화면 크기 전체를 채움
-            .padding(24.dp), // 가장자리에서 24만큼의 여백을 줌
-        horizontalAlignment = Alignment.CenterHorizontally // 자식들을 가로방향 중앙 정렬
+            .fillMaxSize() //이 Column이 화면 크기 전체를 차지
+            .padding(24.dp), //가장자리에서 24만큼의 여백을 줌
+        horizontalAlignment = Alignment.CenterHorizontally //자식들을 가로방향 중앙 정렬
     )
     {
-        Text( // 앱 상단 제목 텍스트 블럭
+        Text( //앱 상단 제목 텍스트 블럭
             text = "퀴즈 카테고리",
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(modifier = Modifier.height(24.dp))
-        Row(
+        Spacer(modifier = Modifier.height(24.dp)) //제목과 아래 내용사이에 여백 생성
+        Row( // 가로 방향으로 자식을 나란히 배치
             modifier = Modifier
                 .padding(top = 80.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .fillMaxWidth(), // 가로폭 전체 사용
+            horizontalArrangement = Arrangement.spacedBy(8.dp)//자식들 간 사이를 균일하게 배치
         ) {
-            QuizData.categories.forEach { (id, title) ->
+            QuizData.categories.forEach { (id, title) -> //각 카테고리id마다 카드를 생성하기 위해 반복문 사용
                 Card(
                     modifier = Modifier
-                        .size(width = 110.dp, height = 120.dp)// 카드 크기 조절
-                        .padding(vertical = 8.dp) // 위아래 여백생성
+                        .size(width = 110.dp, height = 120.dp)//카드 크기 조절
+                        .padding(vertical = 8.dp) //위아래 여백생성
                         //.padding(20.dp)
                         .clickable {
                             //카드가 눌렸을 때 실행됨
-                            selectedCategoryId = id // 핻동 저장
+                            selectedCategoryId = id //핻동 저장
                         }
                 ) {
                     Box( // 카테고리 카드 안의 박스블록
@@ -80,10 +84,11 @@ fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Un
 
         //유저가 선택한 카테고리
         val selectedName = QuizData.categories
-            .find {it.first == selectedCategoryId}?.second // 선택한 카테고리 이름 탐색 후 저장
+            //리스트의 key가 선택된 id와 일치한 항목을 찾으면 value부분을 꺼냄,없으면 null반환
+            .find {it.first == selectedCategoryId}?.second
 
-        if(selectedName != null){ // 카테고리가 존재하면 텍스트 블록 생성
-            Text( // 선택한 카테고리를 나타내주는 텍스트 블록
+        if(selectedName != null){ //카테고리가 존재하면 텍스트 블록 생성
+            Text( //선택한 카테고리를 나타내주는 텍스트 블록
                 text = "선택된 카테고리: $selectedName",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
@@ -92,13 +97,13 @@ fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Un
         Spacer(modifier = Modifier.height(300.dp))
 
         //퀴즈 시작 버튼 & 랭킹 버튼
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) { //남은 영역 전체를 사용
             Button(
                 modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 64.dp,end=32.dp),
-                onClick = { // 버튼을 누르면 퀴즈 시작되도록 카테고리id 전달
+                onClick = { //카테고리가 선택되있으면, 그 id를 콜백함수의 인자로 넘겨버림 - Navhost에 연결
                     selectedCategoryId?.let { categoryId -> onStartQuiz(categoryId) }
                 },
-                enabled = selectedCategoryId != null // 카테고리 선택안했으면 버튼 안나오게
+                enabled = selectedCategoryId != null //카테고리 선택했을때만 활성화 되도록함
             ) {
                 Text(text = "퀴즈 시작")
             }

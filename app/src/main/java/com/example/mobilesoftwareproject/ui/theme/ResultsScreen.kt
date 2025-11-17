@@ -44,13 +44,13 @@ fun ResultScreen(score:Int,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        Text( // 결과 화면 제목 텍스트 블록
+        Text( //결과 화면 제목 텍스트 블록
             text = "결과 화면",
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.padding(24.dp))
 
-        Text( // 최종 점수가 나오는 텍스트 블록
+        Text( //최종 점수가 나오는 텍스트 블록
             text = "최종 점수: $score / $total",
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.fillMaxWidth(),
@@ -71,7 +71,7 @@ fun ResultScreen(score:Int,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(4.dp))
-        TextField( // 입력을 받을수있는 텍스트 블록
+        TextField( //입력을 받을수있는 텍스트 블록
             value = name,
             onValueChange = {name = it},
             modifier = Modifier.fillMaxWidth(),

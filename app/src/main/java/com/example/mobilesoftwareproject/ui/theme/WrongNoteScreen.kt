@@ -44,13 +44,13 @@ fun WrongNoteScreen(
     selectedName: String?,
     onSelectedName: (String?) -> Unit,
     onDeleteWrongAnswer: (WrongAnswer) -> Unit,
-    onBack: () -> Unit // 뒤로 버튼
+    onBack: () -> Unit //뒤로 버튼
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize() // 전체화면 사용
+            .fillMaxSize() //전체화면 사용
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally // 가로방향 가운데 정렬
+        horizontalAlignment = Alignment.CenterHorizontally //가로방향 가운데 정렬
     ) {
         Text(
             text = "오답 노트",
@@ -58,17 +58,17 @@ fun WrongNoteScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 왼쪽 닉네임 목록 + 오른쪽 오답 목록
+        //왼쪽 닉네임 목록 + 오른쪽 오답 목록
         Row(
             modifier = Modifier
-                .weight(1f) // 아래 버튼 제외 모든 공간 사용
+                .weight(1f) //아래 버튼 제외 모든 공간 사용
                 .fillMaxWidth()
         ) {
-            // ===== 왼쪽 : 닉네임 목록 =====
+            //왼쪽 : 닉네임 목록
             Column(
                 modifier = Modifier
-                    .weight(0.35f) // 전체폭의 35% 정도 사용
-                    .fillMaxHeight() // 세로 전체 사용
+                    .weight(0.35f) //전체폭의 35% 정도 사용
+                    .fillMaxHeight() //세로 전체 사용
             ) {
                 Text(
                     text = "닉네임 목록",
@@ -77,17 +77,17 @@ fun WrongNoteScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
-                    onClick = { onSelectedName(null) },  // 전체 보기 (닉네임 필터 해제)
+                    onClick = { onSelectedName(null) },  //전체 보기 (닉네임 필터 해제)
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "전체 보기")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 실제 닉네임 리스트
+                //실제 닉네임 리스트
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(), // 영역 다 사용
-                    verticalArrangement = Arrangement.spacedBy(4.dp) // 항목 사이 간격
+                    modifier = Modifier.fillMaxSize(), //영역 다 사용
+                    verticalArrangement = Arrangement.spacedBy(4.dp) //항목 사이 간격
                 ) {
                     items(nicknames) { name ->
                         val isSelected = (name == selectedName)
@@ -120,7 +120,7 @@ fun WrongNoteScreen(
             //오른쪽 오답 목록
             Column(
                 modifier = Modifier
-                    .weight(0.65f)       // 나머지 65% 사용
+                    .weight(0.65f)//나머지 65% 사용
                     .fillMaxHeight()
             ) {
                 val title = when {
@@ -134,7 +134,7 @@ fun WrongNoteScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (wrongAnswer.isEmpty()) {
-                    // 현재 필터에 해당하는 오답이 없을 때
+                    //현재 필터에 해당하는 오답이 없을 때
                     Text(
                         text = "오답이 없습니다.",
                         style = MaterialTheme.typography.bodyLarge,
@@ -149,7 +149,7 @@ fun WrongNoteScreen(
                         items(wrongAnswer) { item ->
                             wrongAnswerCard(
                                 item = item,
-                                onDelete = { onDeleteWrongAnswer(item) } // 삭제 버튼 누르면 콜백
+                                onDelete = { onDeleteWrongAnswer(item) } //삭제 버튼 누르면 콜백
                             )
                         }
                     }

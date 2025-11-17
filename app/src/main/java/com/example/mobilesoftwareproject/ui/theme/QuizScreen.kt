@@ -43,7 +43,7 @@ fun QuizScreen(
 ) {
     LaunchedEffect(Unit) { WrongAnswerStore.clear() } //컴포저블이 처음 활성화될 때 오답 목록 초기화
 
-    if (question.isEmpty()) { // 퀴즈가 할당되지 않았으면
+    if (question.isEmpty()) { //퀴즈가 할당되지 않았으면
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -59,7 +59,7 @@ fun QuizScreen(
     var selectedOptionIndex by remember { mutableStateOf<Int?>(null) }
     //현재까지 맞춘 개수
     var score by remember { mutableStateOf(0) }
-    //퀴즈가 끝났는지 여부 - (사실 네비게이션으로 화면이 바뀌어서 실질적으로는 거의 안 쓰임)
+    //퀴즈가 끝났는지 여부
     var isFinished by remember { mutableStateOf(false) }
     //현재 문제 객체
     val currentQuestion = question[currentIndex]

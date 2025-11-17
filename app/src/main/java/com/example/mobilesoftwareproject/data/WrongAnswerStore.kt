@@ -5,7 +5,7 @@ import kotlin.collections.sorted
 
 //오답이 저장될 곳
 object WrongAnswerStore {
-    // 오답들을 저장
+    //오답들을 저장
     private val wrongAnswers = mutableListOf<WrongAnswer>() //오답 목록 저장
     //오답 추가
     fun addWrongAnswer(item: WrongAnswer) {
