@@ -20,5 +20,7 @@ data class Ranking(
 data class WrongAnswer(
     val question: Question, // 틀렸던 문제
     val myAnswerIndex:Int, // 선택 했던 보기 인덱스
-    val correctIndex: Int // 정답 보기 인덱스
+    val correctIndex: Int, // 정답 보기 인덱스
+    val categoryId: String,
+    var userName: String? = null
 )

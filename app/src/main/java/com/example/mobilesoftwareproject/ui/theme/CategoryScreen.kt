@@ -31,7 +31,7 @@ import kotlinx.coroutines.selects.select
 
 //카테고리 선택 화면 - 메인 화면
 @Composable
-fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Unit = {}) // 나중에 퀴즈 시작할 때 쓸 콜백
+fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Unit = {},onShowWrongNote: (String) -> Unit = {}) // 나중에 퀴즈 시작할 때 쓸 콜백
 {
     var selectedCategoryId by remember { mutableStateOf<String?>(null) }
     //페이지 넘어갔을 때, 선택한 카테고리를 기억하기 위함
@@ -110,6 +110,15 @@ fun CategoryScreen(onStartQuiz:(String)->Unit = {}, onShowRanking: (String)-> Un
                 enabled = selectedCategoryId != null
             ){
                 Text(text = "랭킹 보기")
+            }
+            OutlinedButton(
+                modifier = Modifier.align(Alignment.BottomStart).padding(bottom = 128.dp,start = 32.dp),
+                onClick = {
+                    selectedCategoryId?.let {id->onShowWrongNote(id)}
+                },
+                enabled = selectedCategoryId != null
+            ) {
+                Text(text = "오답 노트")
             }
         }
     }
