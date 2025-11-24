@@ -156,6 +156,7 @@ fun QuizNavHost() {
             ResultScreen(
                 score = score,
                 total = total,
+                categoryId,
                 onShowWrongNote = {
                     //결과화면 -> 오답노트화면
                     navController.navigate(
@@ -196,12 +197,10 @@ fun QuizNavHost() {
             )
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
-            //카테고리ID에 알맞는 퀴즈들을 호출
-            val questionsForCategory = QuizData.getQuestions(categoryId)
             //QuizScreen 호출
             QuizScreen(
-                question = questionsForCategory,
                 categoryId = categoryId,
+                onGoToMain = { navController.popBackStack() }, // <<< 뒤로가기 기능
                 //퀴즈화면 -> 결과화면 // 점수와 총개수 넘겨줘야함
                 onQuizFinished = { score, total ->
                     navController.navigate(

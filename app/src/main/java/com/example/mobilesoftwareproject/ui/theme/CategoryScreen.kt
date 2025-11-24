@@ -1,21 +1,24 @@
 package com.example.mobilesoftwareproject.ui.theme
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,114 +27,257 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mobilesoftwareproject.data.QuizData
-import kotlinx.coroutines.selects.select
 
-//카테고리 선택 화면 - 메인 화면
 @Composable
-fun CategoryScreen(onStartQuiz:(String)->Unit = {}, // 퀴즈 시작 버튼이 눌렸을 때 신호 전달
-                   onShowRanking: (String)-> Unit = {}, // 랭킹 버튼이 눌렸을 때 신호 전달
-                   onShowWrongNote: (String) -> Unit = {}) // 오답노트 버튼이 눌렸을 때 신호 전달
-{
+fun CategoryScreen(
+    onStartQuiz: (String) -> Unit,
+    onShowRanking: (String) -> Unit,
+    onShowWrongNote: (String) -> Unit
+) {
     var selectedCategoryId by remember { mutableStateOf<String?>(null) }
-    //사용자가 어떤 카테고리를 눌렀는지 기억하기 위함
-    //Compose가 값을 기억하고, 값이 바뀌면 화면을 다시 그려줌
-    //처음엔 아무것도 선택되지않은 상태라 null해야함
-    Column(
+
+    // 전체 배경
+    Box(
         modifier = Modifier
-            .fillMaxSize() //이 Column이 화면 크기 전체를 차지
-            .padding(24.dp), //가장자리에서 24만큼의 여백을 줌
-        horizontalAlignment = Alignment.CenterHorizontally //자식들을 가로방향 중앙 정렬
-    )
-    {
-        Text( //앱 상단 제목 텍스트 블럭
-            text = "퀴즈 카테고리",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(24.dp)) //제목과 아래 내용사이에 여백 생성
-        Row( // 가로 방향으로 자식을 나란히 배치
-            modifier = Modifier
-                .padding(top = 80.dp)
-                .fillMaxWidth(), // 가로폭 전체 사용
-            horizontalArrangement = Arrangement.spacedBy(8.dp)//자식들 간 사이를 균일하게 배치
+            .fillMaxSize()
+            .background(
+                brush = Brush.linearGradient(
+                    0f to Color(0xff3550dc),
+                    1f to Color(0xff27e9f7),
+                    start = Offset(-134.5f, -288.26f),
+                    end = Offset(645.5f, 1410.17f)
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            QuizData.categories.forEach { (id, title) -> //각 카테고리id마다 카드를 생성하기 위해 반복문 사용
-                Card(
+            // 상단 "퀴즈 카테고리" 텍스트
+            Text(
+                text = "퀴즈 카테고리",
+                color = Color.White,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier
+                    .padding(top = 114.dp, start = 24.dp, bottom = 80.dp)
+            )
+
+            // 하단 흰색 컨테이너
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight() // 남은 공간을 모두 차지
+                    .clip(shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(AppColors.color_white)
+                    .padding(horizontal = 24.dp), // 좌우 여백
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 상단 손잡이 모양 바
+                Box(
                     modifier = Modifier
-                        .size(width = 110.dp, height = 120.dp)//카드 크기 조절
-                        .padding(vertical = 8.dp) //위아래 여백생성
-                        //.padding(20.dp)
-                        .clickable {
-                            //카드가 눌렸을 때 실행됨
-                            selectedCategoryId = id //핻동 저장
-                        }
+                        .padding(top = 16.dp, bottom = 24.dp)
+                        .width(48.dp)
+                        .height(4.dp)
+                        .clip(shape = RoundedCornerShape(10.dp))
+                        .background(
+                            brush = Brush.linearGradient(
+                                0f to Color(0xff3550dc),
+                                1f to Color(0xff27e9f7),
+                                start = Offset(-17.22f, -1.42f),
+                                end = Offset(82.62f, 6.95f)
+                            )
+                        )
+                )
+
+                // "Quiz" 텍스트와 하단 바
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box( // 카테고리 카드 안의 박스블록
-                        modifier = Modifier
-                            .padding(35.dp)
-                    ) {
+                    Column {
                         Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleMedium
+                            text = "Quiz",
+                            color = AppColors.color_1,
+                            style = TextStyle(fontSize = 14.sp)
+                        )
+                        Divider(
+                            modifier = Modifier
+                                .padding(top = 2.dp, start = 5.dp)
+                                .width(20.dp),
+                            thickness = 2.dp,
+                            color = AppColors.color_1
                         )
                     }
                 }
-            }
-        }
-        Spacer(modifier = Modifier.padding(24.dp))
 
-        //유저가 선택한 카테고리
-        val selectedName = QuizData.categories
-            //리스트의 key가 선택된 id와 일치한 항목을 찾으면 value부분을 꺼냄,없으면 null반환
-            .find {it.first == selectedCategoryId}?.second
+                Spacer(modifier = Modifier.height(16.dp))
 
-        if(selectedName != null){ //카테고리가 존재하면 텍스트 블록 생성
-            Text( //선택한 카테고리를 나타내주는 텍스트 블록
-                text = "선택된 카테고리: $selectedName",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        Spacer(modifier = Modifier.height(250.dp))
+                // 카테고리 목록
+                LazyColumn(
+                    modifier = Modifier.weight(1f), // 버튼을 제외한 남은 공간을 모두 차지
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // 아이템 사이의 간격
+                ) {
+                    items(QuizData.categories) { category ->
+                        val (categoryId, categoryName) = category
+                        val isSelected = selectedCategoryId == categoryId
+                        val questionCount = QuizData.questions.count { it.categoryId == categoryId }
 
-        //퀴즈 시작 버튼 & 랭킹 버튼
-        Box(modifier = Modifier.fillMaxSize()) { //남은 영역 전체를 사용
-            Button(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 64.dp,end=32.dp),
-                onClick = { //카테고리가 선택되있으면, 그 id를 콜백함수의 인자로 넘겨버림 - Navhost에 연결
-                    selectedCategoryId?.let { categoryId -> onStartQuiz(categoryId) }
-                },
-                enabled = selectedCategoryId != null //카테고리 선택했을때만 활성화 되도록함
-            ) {
-                Text(text = "퀴즈 시작")
-            }
-            OutlinedButton(
-                modifier =  Modifier.align(Alignment.BottomStart).padding(bottom = 64.dp, start = 32.dp),
-                onClick = {
-                    selectedCategoryId?.let {id->onShowRanking(id)}
-                },
-                enabled = selectedCategoryId != null
-            ){
-                Text(text = "랭킹 보기")
-            }
-            OutlinedButton(
-                modifier = Modifier.align(Alignment.BottomStart).padding(bottom = 128.dp,start = 32.dp),
-                onClick = {
-                    selectedCategoryId?.let {id->onShowWrongNote(id)}
-                },
-                enabled = selectedCategoryId != null
-            ) {
-                Text(text = "오답 노트")
+                        CategoryCard(
+                            name = categoryName,
+                            questionCount = questionCount,
+                            isSelected = isSelected,
+                            onClick = { selectedCategoryId = categoryId }
+                        )
+                    }
+                }
+
+                // 하단 버튼 영역
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    BottomButton(
+                        text = "오답 노트",
+                        onClick = { selectedCategoryId?.let { onShowWrongNote(it) } },
+                        enabled = selectedCategoryId != null,
+                        modifier = Modifier.weight(1f)
+                    )
+                    BottomButton(
+                        text = "랭킹 보기",
+                        onClick = { selectedCategoryId?.let { onShowRanking(it) } },
+                        enabled = selectedCategoryId != null,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 퀴즈 시작 버튼
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(shape = RoundedCornerShape(5.dp))
+                        .background(
+                            brush = if (selectedCategoryId != null) {
+                                Brush.linearGradient(
+                                    0f to Color(0xff3550dc),
+                                    1f to Color(0xff27e9f7)
+                                )
+                            } else {
+                                SolidColor(Color.Gray)
+                            }
+                        )
+                        .clickable(enabled = selectedCategoryId != null) {
+                            selectedCategoryId?.let { onStartQuiz(it) }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "퀴즈 시작",
+                        color = AppColors.color_white,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(34.dp)) // 하단 여백
             }
         }
     }
 }
-@Preview(showBackground = true, backgroundColor = 0xFFF5F0EE)
+
+// 재사용을 위해 카테고리 카드를 별도의 Composable로 분리
 @Composable
-fun CategoryScreenPreview(){
+fun CategoryCard(
+    name: String,
+    questionCount: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(96.dp)
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape(5.dp)) // shadow를 먼저 적용
+            .clip(shape = RoundedCornerShape(5.dp))
+            .background(color = AppColors.color_white)
+            .border(
+                border = if (isSelected) BorderStroke(2.dp, AppColors.color_1) else BorderStroke(
+                    0.dp,
+                    Color.Transparent
+                ),
+                shape = RoundedCornerShape(5.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = name,
+                color = AppColors.color_1,
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "$questionCount 문제",
+                color = Color(0xff999999),
+                style = TextStyle(fontSize = 14.sp),
+            )
+        }
+    }
+}
+
+// 재사용을 위해 하단 버튼을 별도의 Composable로 분리
+@Composable
+fun BottomButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(32.dp)
+            .clip(shape = RoundedCornerShape(5.dp))
+            .background(color = if (enabled) Color(0xff333333) else Color.Gray)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = AppColors.color_white,
+            style = TextStyle(fontSize = 12.sp)
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun CategoryScreenPreview() {
     MobileSoftWareProjectTheme {
-        CategoryScreen()
+        CategoryScreen(
+            onStartQuiz = {},
+            onShowRanking = {},
+            onShowWrongNote = {}
+        )
     }
 }

@@ -1,181 +1,419 @@
 package com.example.mobilesoftwareproject.ui.theme
 
-import androidx.benchmark.traceprocessor.Row
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mobilesoftwareproject.data.QuizData.questions
-import com.example.mobilesoftwareproject.model.Question
-import androidx.compose.foundation.layout.Row
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.sp
+import com.example.mobilesoftwareproject.R
 import com.example.mobilesoftwareproject.data.QuizData
 import com.example.mobilesoftwareproject.data.WrongAnswerStore
+import com.example.mobilesoftwareproject.model.Question
 import com.example.mobilesoftwareproject.model.WrongAnswer
 
+// 메인 퀴즈 화면 Composable
 @Composable
-//한 화면에 퀴즈 한 문제씩
 fun QuizScreen(
-    question: List<Question>,//카테고리 내 문제를 가져옴
-    categoryId: String,//어느 카테고리의 퀴즈인지 저장하기 위함
-    onQuizFinished: (score: Int, total: Int) -> Unit //문제가 다 끝난 뒤, 점수와 총 문제 수를 넘기기 위함
+    categoryId: String,
+    onGoToMain: () -> Unit,
+    onQuizFinished: (score: Int, total: Int) -> Unit
 ) {
-    //LaunchedEffect(Unit) { WrongAnswerStore.clear() } //컴포저블이 처음 활성화될 때 오답 목록 초기화
+    val questions = remember { QuizData.getQuestions(categoryId) }
 
-    if (question.isEmpty()) { //퀴즈가 할당되지 않았으면
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("문제가 없습니다.")
+    if (questions.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("이 카테고리에는 문제가 없습니다.")
         }
         return
     }
 
-    //현재 문제 인덱스 상태 저장
-    var currentIndex by remember { mutableStateOf(0) }
-    //유저가 현재 선택한 보기 인덱스 저장
-    var selectedOptionIndex by remember { mutableStateOf<Int?>(null) }
-    //현재까지 맞춘 개수
-    var score by remember { mutableStateOf(0) }
-    //퀴즈가 끝났는지 여부
-    var isFinished by remember { mutableStateOf(false) }
-    //현재 문제 객체
-    val currentQuestion = question[currentIndex]
+    var currentIndex by remember { mutableIntStateOf(0) }
+    // 각 문제에 대해 사용자가 선택한 답을 저장하는 Map
+    val userAnswers = remember { mutableStateMapOf<Int, Int?>() }
+    val currentQuestion = questions[currentIndex]
+    val categoryTitle = QuizData.getCategoryTitleById(categoryId)
 
-    Column(
+    // 전체 배경
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(
+                brush = Brush.linearGradient(
+                    0f to Color(0xff3550dc),
+                    1f to Color(0xff27e9f7),
+                    start = Offset(-134.5f, -288.26f),
+                    end = Offset(645.5f, 1410.17f)
+                )
+            )
     ) {
-        Text(//상단에 문제 진행 현황 텍스트 블록
-            text = "문제 ${currentIndex + 1} / ${question.size}",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Start
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text( //문제 내용
-            text = currentQuestion.text,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Start
+        // 상단 헤더
+        Header(
+            categoryTitle = categoryTitle,
+            onBackClick = onGoToMain
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // 하얀색 메인 컨테이너
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .requiredHeight(760.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                .background(Color.White)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 상단 손잡이 모양 바
+            Box(
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 24.dp)
+                    .size(width = 48.dp, height = 4.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        brush = Brush.linearGradient(
+                            0f to Color(0xff3550dc),
+                            1f to Color(0xff27e9f7)
+                        )
+                    )
+            )
 
-        //보기 4개를 카드 블록으로 표현
-        currentQuestion.options.forEachIndexed { index, optionText ->
-            val isSelected = selectedOptionIndex == index // 선택된 보기인지 여부
+            // 문제 진행도 표시 바
+            ProgressIndicator(
+                total = questions.size,
+                current = currentIndex + 1
+            )
 
-            Card(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 문제 텍스트
+            Text(
+                text = currentQuestion.text,
+                color = AppColors.color_black,
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 6.dp)
-                    .clickable {
-                        selectedOptionIndex = index //보기가 선택됨
-                    },
-                colors = CardDefaults.cardColors(
-                    containerColor =
-                        if (isSelected)
-                            MaterialTheme.colorScheme.primaryContainer
-                        else
-                            MaterialTheme.colorScheme.surface
+                    .padding(bottom = 24.dp)
+            )
+
+            // 선택지 목록
+            currentQuestion.options.forEachIndexed { index, optionText ->
+                OptionItem(
+                    optionChar = ('A' + index).toString(),
+                    optionText = optionText,
+                    isSelected = userAnswers[currentIndex] == index,
+                    onClick = { userAnswers[currentIndex] = index }
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // 하단 네비게이션 버튼
+            BottomNavigation(
+                isFirst = currentIndex == 0,
+                isLast = currentIndex == questions.lastIndex,
+                onPrev = { if (currentIndex > 0) currentIndex-- },
+                onNext = { if (currentIndex < questions.lastIndex) currentIndex++ },
+                onSubmit = {
+                    var score = 0
+                    questions.forEachIndexed { index, question ->
+                        val userAnswerIndex = userAnswers[index]
+                        if (userAnswerIndex == question.answerIndex) {
+                            score++
+                        } else if (userAnswerIndex != null) {
+                            // 오답인 경우 기록
+                            WrongAnswerStore.addWrongAnswer(
+                                WrongAnswer(
+                                    question = question,
+                                    myAnswerIndex = userAnswerIndex,
+                                    correctIndex = question.answerIndex,
+                                    categoryId = categoryId
+                                )
+                            )
+                        }
+                    }
+                    onQuizFinished(score, questions.size)
+                }
+            )
+            Spacer(modifier = Modifier.height(34.dp))
+        }
+    }
+}
+
+// 상단 헤더 Composable
+@Composable
+private fun Header(categoryTitle: String, onBackClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(top = 60.dp, start = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.img_43),
+            contentDescription = "Back",
+            modifier = Modifier
+                .size(24.dp)
+                .clickable(onClick = onBackClick)
+        )
+        Spacer(modifier = Modifier.size(16.dp))
+        Text(
+            text = categoryTitle,
+            color = Color.White,
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
+        )
+    }
+}
+
+@Composable
+private fun ProgressIndicator(total: Int, current: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Top
+    ) {
+        // 실제 문제 수 만큼만 동그라미를 그림
+        repeat(total) { index ->
+            val number = index + 1
+            val isActive = number == current
+
+            // 원과 밑줄을 묶는 Column
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp) // 원과 밑줄 사이의 간격
             ) {
+                // 숫자 원
+                val circleBrush = if (isActive) {
+                    Brush.linearGradient(
+                        0f to Color(0xff3550dc),
+                        1f to Color(0xff27e9f7)
+                    )
+                } else {
+                    SolidColor(AppColors.color_d4)
+                }
+
                 Box(
-                    modifier = Modifier.padding(12.dp),
-                    contentAlignment = Alignment.CenterStart
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(brush = circleBrush),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = optionText,
-                        style = MaterialTheme.typography.bodyLarge
+                        text = number.toString(),
+                        color = Color.White,
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     )
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+                // 개별 밑줄
+                val underlineBrush = if (isActive) {
+                    Brush.linearGradient(
+                        0f to Color(0xff3550dc),
+                        1f to Color(0xff27e9f7)
+                    )
+                } else {
+                    // 비활성 상태에서는 회색 밑줄
+                    SolidColor(AppColors.color_d4)
+                }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            val isLastQuestion = currentIndex == question.lastIndex
-
-            Button(
-                onClick = {
-                    val selectedIndex = selectedOptionIndex ?: return@Button
-                    //보기 선택 전이면 버튼 작동 안함
-
-                    if (selectedIndex == currentQuestion.answerIndex) {
-                        //정답이면 점수 +1
-                        score++
-                    } else {
-                        //오답이면 WrongAnswerStore 에 추가
-                        val wrongItem = WrongAnswer(
-                            question = currentQuestion,
-                            myAnswerIndex = selectedIndex,
-                            correctIndex = currentQuestion.answerIndex,
-                            categoryId = categoryId
-                        )
-                        WrongAnswerStore.addWrongAnswer(wrongItem)
-                    }
-
-                    if (isLastQuestion) {
-                        isFinished = true
-                        onQuizFinished(score, question.size)
-                    } else {
-                        currentIndex++
-                        selectedOptionIndex = null
-                    }
-                },
-                enabled = selectedOptionIndex != null && !isFinished
-            ) {
-                Text(
-                    text = when {
-                        isFinished -> "퀴즈 완료"
-                        isLastQuestion -> "제출"
-                        else -> "다음 문제"
-                    }
+                Box(
+                    modifier = Modifier
+                        .size(width = 46.dp, height = 2.dp)
+                        .background(brush = underlineBrush)
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF5F0EE)
+
+
+// 선택지 아이템 Composable
 @Composable
-fun QuizScreenPreview() {
-    val sampleQuestions = QuizData.getQuestions("movie")
+private fun OptionItem(
+    optionChar: String,
+    optionText: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundBrush = if (isSelected) {
+        Brush.linearGradient(
+            0f to Color(0xff3550dc),
+            1f to Color(0xff27e9f7)
+        )
+    } else {
+        SolidColor(AppColors.color_d4)
+    }
+    val textColor = if (isSelected) AppColors.color_1 else AppColors.color_black
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(brush = backgroundBrush),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = optionChar,
+                color = Color.White,
+                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
+            )
+        }
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(
+            text = optionText,
+            color = textColor,
+            style = TextStyle(fontSize = 14.sp)
+        )
+    }
+}
+
+// 하단 네비게이션 Composable
+@Composable
+private fun BottomNavigation(
+    isFirst: Boolean,
+    isLast: Boolean,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
+    onSubmit: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 이전 버튼
+        NavArrowButton(
+            iconId = R.drawable.vector,
+            onClick = onPrev,
+            enabled = !isFirst,
+            rotation = -180f
+        )
+
+        // 제출 버튼 (마지막 문제에서만 보임)
+        if (isLast) {
+            SubmitButton(onClick = onSubmit)
+        }
+
+        // 다음 버튼
+        NavArrowButton(
+            iconId = R.drawable.vector,
+            onClick = onNext,
+            enabled = !isLast
+        )
+    }
+}
+
+// 이전/다음 화살표 버튼 Composable
+@Composable
+private fun NavArrowButton(
+    iconId: Int,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    rotation: Float = 0f
+) {
+    val backgroundBrush = if (enabled) {
+        Brush.linearGradient(
+            0f to Color(0xff3550dc),
+            1f to Color(0xff27e9f7)
+        )
+    } else {
+        SolidColor(AppColors.color_d4)
+    }
+
+    Box(
+        modifier = Modifier
+            .size(50.dp)
+            .clip(CircleShape)
+            .background(brush = backgroundBrush)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = "Arrow",
+            modifier = Modifier.rotate(rotation)
+        )
+    }
+}
+
+// 제출 버튼 Composable
+@Composable
+private fun SubmitButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .requiredWidth(195.dp)
+            .requiredHeight(50.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .border(
+                border = BorderStroke(1.dp, AppColors.color_1),
+                shape = RoundedCornerShape(5.dp)
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "제출",
+            color = AppColors.color_1,
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        )
+    }
+}
+
+// 디자인 프리뷰
+@Preview(showBackground = true)
+@Composable
+private fun QuizScreenPreview() {
     MobileSoftWareProjectTheme {
         QuizScreen(
-            question = sampleQuestions,
             categoryId = "movie",
+            onGoToMain = {},
             onQuizFinished = { _, _ -> }
         )
     }
 }
+

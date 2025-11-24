@@ -32,3 +32,18 @@ val Typography = Typography(
     )
     */
 )
+
+object AppTypes {
+    val type_Body_Normal_Medium = TextStyle(
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp
+    )
+    val type_Body_Small_Regular = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    )
+    val type_Body_XSmall_Medium = TextStyle(
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp
+    )
+}

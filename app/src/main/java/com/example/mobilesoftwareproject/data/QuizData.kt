@@ -8,6 +8,12 @@ val categories = listOf(
         "music" to "음악",
         "game" to "게임"
     )
+    fun getCategoryTitleById(id: String): String {
+        // categories 리스트에서 id가 일치하는 항목(it.first)을 찾고,
+        // 그 항목의 두 번째 값(it.second, 즉 이름)을 반환합니다.
+        // 만약 해당하는 id가 없으면 "알 수 없는 카테고리"를 반환합니다.
+        return categories.find { it.first == id }?.second ?: "알 수 없는 카테고리"
+    }
     // 실제 문제들
     val questions: List<Question> = listOf(
         //------------------영화--------- - 명대사 맞히기 퀴즈
